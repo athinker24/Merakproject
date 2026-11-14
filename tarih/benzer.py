@@ -31,17 +31,18 @@ def log(s):
 KARSILIK = [
     {   # 1: İskandinav dağları batı kıyısında (Ulu Dağlar), Fin kalkanı göllü kuzey, Urallar doğu sınırda (Mavi Dağlar)
         "ad": "Avrupa", "kutu": (-4, 84, 42, 72), "parca": {"1", "2"},
-        "etiket": [("ULU DAĞLAR", 13.5, 63.0, 16), ("MAVİ DAĞLAR", 59.5, 61.5, 16), ("Ak Kalkan", 30.5, 64.0, 16)],
+        "etiket": [("ULU DAĞLAR", 13.5, 63.0, 16), ("Ak Kalkan", 30.5, 64.0, 16)],
         "nokta": [(105, 470, 7.0, 58.0), (190, 105, 25.8, 71.1), (800, 110, 59.2, 65.0), (808, 520, 58.3, 54.2)],
         "bolge": [(0, 0), (870, 0), (875, 300), (880, 600), (860, 620), (600, 720), (560, 960), (400, 880), (260, 880), (170, 795), (90, 775), (0, 725)],
     },
     {   # Mavi Dağlar: 430 milyon yıllık 1 ile 2 dikişi. Düz Ural şeridi yerine kıvrımlı, yaşlı Apalaş sırtları (sahibin çizdiği hat).
-        "ad": "Mavi", "kutu": (-90, -72, 32, 44), "parca": {"1", "2"}, "oncelik": 2.5, "yumusak_km": 45,
-        "etiket": [],
-        "nokta": [(793, 139, -76.3, 41.6), (808, 228, -78.6, 39.6), (822, 312, -80.6, 37.9), (833, 407, -82.9, 36.2),
-                  (840, 512, -85.6, 34.4)],
-        "bolge": [(760, 110), (830, 110), (850, 230), (868, 320), (878, 410), (885, 520), (800, 530), (790, 410), (775, 320),
-                  (760, 230)],
+        "ad": "Mavi", "kutu": (-90, -72, 32, 44), "parca": {"1", "2"}, "oncelik": 2.5, "yumusak_km": 45, "carpan": 1.35,
+        "etiket": [("MAVİ DAĞLAR", -79.6, 38.6, 16)],
+        # sahibin çizdiği kavisli hat: kuzey kıyıdaki yarığın biraz batısından güneybatıya, iç denize doğru
+        "nokta": [(750, 212, -76.3, 41.6), (744, 300, -78.6, 39.6), (744, 360, -80.6, 37.9), (724, 420, -82.9, 36.2),
+                  (690, 480, -85.6, 34.4)],
+        "bolge": [(715, 180), (785, 180), (790, 300), (790, 365), (770, 430), (735, 500), (650, 495), (685, 410), (700, 360),
+                  (700, 300), (710, 230)],
     },
     {   # 2'nin kuzeyi ve ortası: Orta Sibirya; Putorana = Kuzey Tuzakları, Baykal = Derin Göl, Sayanlar = Uzak Sıra
         "ad": "Sibirya", "kutu": (60, 140, 44, 78), "parca": {"2", "serit"},
@@ -412,7 +413,7 @@ def ekvator_kalkan(z, kara, s):
 
 
 # Mavi Dağlar ve çevresi Mor çarpışmasından az etkilenip hafifçe kabarır: kuzeyde yaklaşık 150 m, güneyde (Mor'a yakın) 350 m
-MAVI = {"cizgi": [(793, 139), (808, 228), (822, 312), (833, 407), (840, 512)], "kabarti": [150, 190, 240, 300, 350], "yari_km": 160.0}
+MAVI = {"cizgi": [(750, 212), (744, 300), (744, 360), (724, 420), (690, 480)], "kabarti": [150, 190, 240, 300, 350], "yari_km": 160.0}
 
 
 def mavi_kabarti(z, kara, s):
@@ -457,6 +458,23 @@ def sari_uc(z, kara, s):
     ImageDraw.Draw(im).polygon([(x * s, y_ * s) for x, y_ in g["yayla"]], fill=1.0)
     Y = ndimage.gaussian_filter(np.asarray(im), 50 / (O.KM_PX / s)) * (1 - W)
     return np.where(kara & (z > b), b + (z - b) * (1 - Y * (1 - g["yayla_kat"])), z)
+
+
+# Avrupa karşılığındaki Urallar düz bir çizgi halinde Mavi çizgisine düşüyor; Mavi Dağlar başka yere taşındığı için bastırılır
+URAL = {"cizgi": [(800, 100), (808, 530)], "yari_km": 110.0, "taban": 150.0, "kat": 0.2}
+
+
+def ural_bastir(z, kara, s):
+    from scipy.spatial import cKDTree
+    c = np.array(URAL["cizgi"], float)
+    pts = np.vstack([c[0] + (c[1] - c[0]) * t for t in np.linspace(0, 1, 300)[:, None]]) * s
+    ny, nx = z.shape
+    yy, xx = np.mgrid[0:ny:4, 0:nx:4]
+    d, _ = cKDTree(pts).query(np.stack([xx.ravel(), yy.ravel()], 1))
+    W = np.clip((URAL["yari_km"] - d.reshape(xx.shape) * O.KM_PX / s) / 50, 0, 1)
+    W = ndimage.zoom(W, (ny / W.shape[0], nx / W.shape[1]), order=1)[:ny, :nx]
+    b = URAL["taban"]
+    return np.where(kara & (z > b), b + (z - b) * (1 - W * (1 - URAL["kat"])), z)
 
 
 MOR_SIRT = [(1075, 615), (1150, 562), (1300, 562), (1500, 614), (1715, 674), (1870, 700)]
@@ -534,6 +552,7 @@ def bilesik():
     z = np.where(z > 850, 850 + (z - 850) * (1 - 0.75 * Wl), z)
     z = on_ova(z, kara, s, lab, adlar)
     z = sirt_taban(z, kara, s)
+    z = ural_bastir(z, kara, s)
     z = mavi_kabarti(z, kara, s)
     z = sari_uc(z, kara, s)
     if TASARIM.get("etkin"):
