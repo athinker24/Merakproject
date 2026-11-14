@@ -46,7 +46,7 @@ KARSILIK = [
     },
     {   # 2'nin kuzeyi ve ortası: Orta Sibirya; Putorana = Kuzey Tuzakları, Baykal = Derin Göl, Sayanlar = Uzak Sıra
         "ad": "Sibirya", "kutu": (60, 140, 44, 78), "parca": {"2", "serit"},
-        "etiket": [("Derin Göl", 110.6, 54.6, 15), ("UZAK SIRA", 96.5, 52.6, 17), ("Boz Kalkan", 110.0, 64.0, 16)],
+        "etiket": [("UZAK SIRA", 96.5, 52.6, 17), ("Boz Kalkan", 110.0, 64.0, 16)],
         "nokta": [(1250, 150, 93.0, 69.0), (1680, 240, 106.5, 53.0)],
         "gol": [("Derin Göl", [(103.7, 51.5), (104.9, 51.5), (106.2, 52.1), (107.4, 52.8), (108.6, 53.4), (109.5, 54.4), (110.0, 55.7),
                                (109.4, 55.9), (108.5, 54.9), (107.3, 53.9), (106.3, 53.3), (105.2, 52.6), (104.1, 51.9)])],
@@ -312,6 +312,70 @@ def tasarla(z, kara, s, doku):
     return np.where(kara, z * (1 - W) + np.maximum(yeni, 5) * W, z)
 
 
+# ------------------------------------------------------------------ sahibin son düzeltmeleri (14 Kasım)
+def _gur(ny, nx, hk, km, kok):
+    g = ndimage.gaussian_filter(np.random.default_rng(kok).standard_normal((ny // 4, nx // 4)), km / hk / 4)
+    return ndimage.zoom(g / g.std(), (ny / g.shape[0], nx / g.shape[1]), order=1)[:ny, :nx]
+
+
+def dogu_mor(z, kara, s):
+    """Mor'un doğu ucu: Tibet benzeri düğüm alçak yaylaya iner; sıra aynı karşılığın (aynalanmış Himalaya ön kuşağı, Hindukuş'a
+    kadar) devamıyla sahibin çizdiği kıvrımda kuzeydoğuya döner ve incelerek biter; güneyi ön ülke ovası."""
+    from scipy.spatial import cKDTree
+    import copy
+    ny, nx = z.shape; hk = O.KM_PX / s
+    im = Image.new("F", (nx, ny), 0.0)
+    ImageDraw.Draw(im).polygon([(x * s, y * s) for x, y in [(1650, 420), (2000, 420), (2000, 740), (1700, 740), (1630, 650)]], fill=1.0)
+    W = ndimage.gaussian_filter(np.asarray(im), 60 / hk)
+    b0 = 500.0
+    z2 = np.where(kara & (z > b0), b0 + (z - b0) * (1 - W * 0.67), z)
+    k = copy.deepcopy([q for q in KARSILIK if q["ad"] == "Mor"][0])
+    k["nokta"] = [(1110, 595, 95.0, 29.6), (1300, 565, 88.1, 27.8), (1500, 614, 83.5, 28.7), (1630, 628, 79.6, 30.9),
+                  (1700, 628, 77.6, 32.0), (1760, 600, 75.9, 33.4), (1820, 540, 74.4, 34.9), (1870, 515, 72.6, 35.9),
+                  (1920, 505, 70.9, 36.2), (1955, 482, 69.4, 35.7), (1985, 455, 67.9, 35.0)]
+    c = np.array([p[:2] for p in k["nokta"][2:]], float)
+    pts = np.vstack([c[i] + (c[i + 1] - c[i]) * t for i in range(len(c) - 1) for t in np.linspace(0, 1, 80)[:, None]]) * s
+    gur = lambda km, kok: _gur(ny, nx, hk, km, kok)
+    bx = (gur(300, 51) * 25 + gur(80, 52) * 10) / hk; by = (gur(300, 53) * 25 + gur(80, 54) * 10) / hk
+    yy, xx = np.mgrid[0:ny, 0:nx].astype(np.float32)
+    qx = (xx + bx)[::4, ::4]; qy = (yy + by)[::4, ::4]
+    dd, ii = cKDTree(pts).query(np.stack([qx.ravel(), qy.ravel()], 1))
+    yon = (qy.ravel() - pts[ii, 1])
+    sh = (ny / qx.shape[0], nx / qx.shape[1])
+    d = ndimage.zoom(dd.reshape(qx.shape) * hk, sh, order=1)[:ny, :nx]
+    guney = ndimage.zoom(yon.reshape(qx.shape) * hk, sh, order=1)[:ny, :nx]
+    xr = xx / s
+    tt = ndimage.zoom((ii / (len(pts) - 1)).reshape(qx.shape), sh, order=1)[:ny, :nx]
+    incel = np.clip((tt - 0.40) / 0.60, 0, 1) ** 1.1
+    genis = (105 + 45 * np.clip(gur(220, 55), -1.5, 1.5)) * (1 - 0.93 * incel)
+    Wb = np.clip((genis - d) / 55, 0, 1) * np.clip((xr - 1560) / 80, 0, 1)
+    A, _ = ornekle(k, ny, nx, s, (Wb > 0).astype(np.float32), {}, None)
+    uc = 1 - incel; uc = 0.12 + 0.88 * uc * uc * (3 - 2 * uc)
+    A = 300 + (A - 300) * uc
+    z2 = np.where(kara, z2 * (1 - Wb) + np.maximum(A, z2) * Wb, z2)
+    bas = 65 + 30 * np.clip(gur(180, 56), -1.5, 1.5)
+    Wo = np.clip((guney - bas) / 60, 0, 1) * np.clip((xr - 1540) / 80, 0, 1) * (guney < 900)
+    return np.where(kara & (z2 > 40), 40 + (z2 - 40) * (1 - 0.8 * Wo), z2)
+
+
+# 3'ün güney yarımadası: yarık omzu. Güneydoğu Kanalı açılırken batı kenar yükseldi; kanala bakan basamak, kuzeydoğuya eğik yayla.
+# Karşılığı Arabistan'ın Kızıldeniz kenarı (Asir ve Yemen dağları). Doğu yarımadası (volkanik yay) değişmez.
+YARIMADA = {"ad": "Arabistan", "kutu": (34, 56, 11, 29),
+            "bolge": [(1020, 960), (1200, 940), (1420, 980), (1440, 1100), (1420, 1250), (1470, 1430), (1350, 1420), (1150, 1250), (1030, 1080)],
+            "nokta": [(1050, 1012, 38.9, 23.7), (1250, 1203, 41.9, 18.6), (1380, 1332, 43.9, 13.6), (1330, 1050, 46.0, 21.0)]}
+
+
+def guney_yarimada(z, kara, s):
+    ny, nx = z.shape; hk = O.KM_PX / s
+    im = Image.new("F", (nx, ny), 0.0)
+    ImageDraw.Draw(im).polygon([(x * s, y * s) for x, y in YARIMADA["bolge"]], fill=1.0)
+    W = ndimage.gaussian_filter(np.asarray(im), 45 / hk) * kara
+    A, _ = ornekle(YARIMADA, ny, nx, s, (W > 1e-3).astype(np.float32), {}, None)
+    dk = ndimage.distance_transform_edt(kara) * hk
+    u = np.clip(dk / 30.0, 0, 1); rampa = 0.35 + 0.65 * u * u * (3 - 2 * u)
+    return np.where(kara, z * (1 - W) + np.maximum(A * rampa, 5) * W, z)
+
+
 GOL = None
 # Kaynak Sırası: dokunun altına geniş ve alçak kabartı (boşluk kalmasın); doruklar yumuşak sınırla 3500 m dolayında tutulur
 SIRT_TABAN = {"cizgi": [(1150, 241), (1108, 291), (1077, 333), (1055, 386), (1024, 438), (977, 475), (908, 498)],
@@ -571,6 +635,10 @@ def bilesik():
         z = sirt_guney(z, kara, s, kaynaklar)
     z = ekvator_kalkan(z, kara, s)
     z = np.where(kara, np.maximum(z, 1.0), 0.0)
+    z = dogu_mor(z, kara, s)
+    z = guney_yarimada(z, kara, s)
+    z = np.where(kara, np.maximum(z, 1.0), 0.0)
+    log("doğu Mor ve güney yarımada işlendi")
     np.save(f"{CIKTI}/benzer_z.npy", z.astype(np.float32))
     np.save(f"{CIKTI}/benzer_gol.npy", (GOL > 0.5) & kara)
     log(f"bileşik en yüksek {z.max():.0f} m")
@@ -719,8 +787,7 @@ def ciz():
     pur = ndimage.gaussian_filter(np.random.default_rng(12).standard_normal(z.shape), 3.0)
     nh = AR.nehirler(z + 4.0 * pur / pur.std(), kt, Pt, AR.H_M / 2)
     log(f"nehir parçası {len(nh)}")
-    gol = buzul_golleri(zt, kt)
-    gol |= np.load(f"{CIKTI}/benzer_gol.npy") & kt
+    gol = np.zeros_like(kt)  # göller şimdilik çizilmez (sahip: su kaynaklarına şu an gerek yok)
     im, _, _ = AR.ciz(zt, kt, Pt, None, gol, 1, AR.H_M / 2, nh, kar_kurak=0.0, kar_bolge=True)
     im.save(f"{CIKTI}/topografya.png")
     duz, _, _ = AR.ciz(zt, kt, Pt, None, gol, 1, AR.H_M / 2, None, kar_kurak=0.0, kar_bolge=True, kenar_ciz=False)

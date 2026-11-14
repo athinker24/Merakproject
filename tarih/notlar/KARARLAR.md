@@ -69,3 +69,9 @@ en büyük fark 0,1 m; batı sırtı kutusunda 0; kara maskesi farkı 0. Hikâye
 Kaynak Sırası sahibin çizdiği S hattında: atlasta 49,5°K 5,8°D'den 38,2°K 4,8°B'ye; kuzey yarısında tepe 2950 ile 3100 m, dibe doğru
 incelerek ve alçalarak 800 m'ye iner. Önceki 36 ile 44°K arası kesintisiz sırt (gedik kapatma) bununla geçersiz; bozkır yeniden ölçülmeli.
 Mavi Dağlar: Ural şeridi yerine kıvrımlı Apalaş sırtları (tepe 850 ile 1200 m) ve çevresiyle hafif kabartı (kuzeyde 150, güneyde 350 m).
+
+## Doğu Mor, güney yarımada, göller (sahibin isteği)
+- Mor Sıradağları'nın doğu ucundaki Tibet benzeri düğüm alçak yaylaya indi; sıra aynı karşılığın devamıyla (Himalaya ön kuşağı, Hindukuş)
+  sahibin çizdiği kıvrımda kuzeydoğuya döner ve incelerek biter; güneyi ön ülke ovası (benzer.py dogu_mor).
+- 3'ün güney yarımadası yarık omzu: Arabistan'ın Kızıldeniz kenarı karşılığı (benzer.py guney_yarimada). Kuyruklardaki sırtlar ertelendi.
+- Göller şimdilik çizilmiyor. Atlasta: kara maskesi aynı, batı sırtı kutusunda fark 0, ekvator bandı ortanca 655 m (önce 643), p10 99 m (önce 136).

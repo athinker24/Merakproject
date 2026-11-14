@@ -256,6 +256,7 @@ DONEMLER = [
             "kapandığı için orada kapanmamış bir deniz kolu kaldı: bugünkü üçgen koy. Yeni Mor Okyanusu'nun 3'ün batısında "
             "kalan parçası kuşatıldı; doğu iç denizin tabanı bu eski okyanusun kalıntısıdır."),
         "olaylar": [
+            (45, "Doğu kıvrımı", "3'ün doğu köşesi 2'yi iterken Mor kuşağının doğu ucu kuzeydoğuya bükülür; sıra orada daralarak söner, arkasında geniş yayla oluşmaz."),
             (50, "Doğu ucunda ilk temas", "3'ün kuzeydoğu köşesi İnce Şerit'e değer."),
             (45, "Mor Sıradağları yükselir", "Doğu kesimde hızlı kalınlaşma."),
             (30, "Tuzak Çanağı kalkar", "Sıkışma kuzeye iletilir; sert Kır Çekirdeği kıvrılmadan bütün olarak yaklaşık 1 km yükselir, kenarındaki eski dikişler Çanak Sıraları olur, batısında 2 milyar yıllık Kaynak dikişi yeniden sıkışıp Kaynak Sırası'nı yükseltir; ortası düz kalır, dört yanı kapalı bir bozkır çanağı (Tarım benzeri)."),
@@ -288,6 +289,7 @@ DONEMLER = [
             (14, "Sarı yayı", "4'ün doğu kenarında volkanlar (5'in önündeki okyanus kabuğu dalar)."),
             (10, "Ada yayı volkanları", "6'nın güney açığında volkan adaları."),
             (8, "Sarı çarpışması", "5'in güney ucu 4'e çarpar; çarpışma kuzeye ilerler."),
+            (9, "Güney omzu kalkar", "Güneydoğu Kanalı açılırken 3'ün güney yarımadasının batı kenarı yükselir: kanala bakan dik basamak, kuzeydoğuya eğik yayla (Kızıldeniz kıyısındaki Asir ve Yemen dağları benzeri)."),
             (8, "Kanalda okyanus kabuğu", "Güneydoğu kanalının kuzeyinde deniz tabanı yayılması."),
             (5, "Sarı Sıradağları hızla yükselir", "Genç, dik, hızla aşınan dağlar; Tayvan benzeri."),
             (4, "Mor Sıradağları bugünkü yüksekliğinde", "En yüksek doruklar 6 km dolayı; arkadaki yayla ortalama 1 km."),
