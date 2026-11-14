@@ -374,6 +374,32 @@ def sirt_guney(z, kara, s, kaynaklar):
     return z
 
 
+# Ekvator kuşağı kalkan yükselmesi (atlas oturumunun isteği: tropikal alçak karada savan fazlası). Atlas enleminde 2,5°G ile 12,5°K
+# arası tam, 10°G ve 20°K'ye doğru doğrusal söner; kıyıdan içeri yükselir, dağlar kaldırılmaz. Atlas kaydı: tuval satırı =
+# maske satırı × sy + oy (atlas_cikti.py), enlem = 90 − satır × 180 / 2048. 20°K kuzeyine dokunmaz.
+EKVATOR = {"sy": 0.262088002, "oy": 341.325717, "genlik": 480.0, "ic_km": 140.0, "dag_m": (1000.0, 2500.0)}
+
+
+def atlas_enlem(satir):
+    return 90 - (satir * EKVATOR["sy"] + EKVATOR["oy"]) * 180 / 2048
+
+
+def ekvator_kalkan(z, kara, s):
+    e = EKVATOR
+    ny, nx = z.shape
+    lat = atlas_enlem(np.arange(ny) * (2914 / ny))[:, None]
+    U = np.interp(lat, [-10, -2.5, 12.5, 20], [0, 1, 1, 0], left=0, right=0)
+    dk = ndimage.distance_transform_edt(kara) * O.KM_PX / s
+    u = np.clip(dk / e["ic_km"], 0, 1)
+    R = u * u * (3 - 2 * u)
+    d0, d1 = e["dag_m"]
+    H = np.clip((d1 - z) / (d1 - d0), 0, 1)            # yüksek dağlara eklenmez
+    g = ndimage.gaussian_filter(np.random.default_rng(23).standard_normal((ny // 8, nx // 8)), 6)
+    g = ndimage.zoom(g / g.std(), (ny / g.shape[0], nx / g.shape[1]), order=1)[:ny, :nx]
+    yuk = e["genlik"] * U * R * H * (1 + 0.25 * np.clip(g, -2, 2))   # kubbe düz olmasın
+    return np.where(kara, z + yuk, z)
+
+
 MOR_SIRT = [(1075, 615), (1150, 562), (1300, 562), (1500, 614), (1715, 674), (1870, 700)]
 
 
@@ -462,6 +488,7 @@ def bilesik():
     u = np.clip(dk / 45.0, 0, 1)
     z = z * (0.3 + 0.7 * u * u * (3 - 2 * u))
     z = sirt_guney(z, kara, s, kaynaklar)
+    z = ekvator_kalkan(z, kara, s)
     z = np.where(kara, np.maximum(z, 1.0), 0.0)
     np.save(f"{CIKTI}/benzer_z.npy", z.astype(np.float32))
     np.save(f"{CIKTI}/benzer_gol.npy", (GOL > 0.5) & kara)
@@ -615,6 +642,8 @@ def ciz():
     gol |= np.load(f"{CIKTI}/benzer_gol.npy") & kt
     im, _, _ = AR.ciz(zt, kt, Pt, None, gol, 1, AR.H_M / 2, nh, kar_kurak=0.0, kar_bolge=True)
     im.save(f"{CIKTI}/topografya.png")
+    duz, _, _ = AR.ciz(zt, kt, Pt, None, gol, 1, AR.H_M / 2, None, kar_kurak=0.0, kar_bolge=True, kenar_ciz=False)
+    duz.save(f"{CIKTI}/topografya_duz.png")  # kontursuz: kıyı çizgisi ve nehir yok (atlas kabartma kaynağı)
     etiketle(im.copy()).save(f"{CIKTI}/topografya_etiketli.png")
     np.save(f"{CIKTI}/son_z_tam.npy", np.where(gol, zt, zt).astype(np.float32))
     np.save(f"{CIKTI}/son_z.npy", ndimage.zoom(zt, (AR.NY / nyt, AR.NX / nxt), order=1)[:AR.NY, :AR.NX].astype(np.float32))

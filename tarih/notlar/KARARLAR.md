@@ -59,3 +59,8 @@ ucundan ayrılıp güneybatıya inen bir kol: atlasta yaklaşık 50,6°K 4,3°D'
 Gedik kapatıldı (atlas oturumunun kararı): 44°K ile 36°K arası, 44°K 2,7°B ile 36°K 3,6°B hattında, kuzey kesimle aynı genişlikte.
 Atlas çözünürlüğünde 92 satırın her birinde tepe 3099 ile 3782 m (medyan 3593). 44,5°K kuzeyi değişmedi (tam çözünürlükte en büyük fark 3 m);
 44,0 ile 44,5°K arası birleşme kuşağı. Doku Kafkas'ın yüksek orta bölümünden, ters yönde.
+
+## Ekvator kuşağı kalkan yükselmesi (atlas oturumunun isteği, beşinci denemede savan fazlası)
+Atlas enleminde 2,5°G ile 12,5°K arası tam, 10°G ve 20°K'ye doğru doğrusal sönen, kıyıdan 140 km içeriye kadar artan, 1000 m üstü dağlara
+eklenmeyen yaklaşık 480 m'lik kubbe (benzer.py EKVATOR). Atlasta bant karası: ortanca 236'dan 644 m'ye, p10 36'dan 136 m'ye. 20°K kuzeyinde
+en büyük fark 0,1 m; batı sırtı kutusunda 0; kara maskesi farkı 0. Hikâyede 15 MYÖ "Güney kubbesi".

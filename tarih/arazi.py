@@ -360,7 +360,7 @@ def renk(tablo, z):
     return np.stack([np.interp(z, tablo[:, 0], tablo[:, i]) for i in (1, 2, 3)], -1)
 
 
-def ciz(z, kara, P, A, gol, olcek=2, h_m=H_M, nehir=None, kar_kurak=0.0, kar_bolge=False):
+def ciz(z, kara, P, A, gol, olcek=2, h_m=H_M, nehir=None, kar_kurak=0.0, kar_bolge=False, kenar_ciz=True):
     """Tam çözünürlükte (maske boyutu) gölgeli kabartma ve hipsometrik renk."""
     ny, nx = z.shape[0] * olcek, z.shape[1] * olcek
     zb = ndimage.zoom(z, olcek, order=3)[:ny, :nx]
@@ -413,8 +413,9 @@ def ciz(z, kara, P, A, gol, olcek=2, h_m=H_M, nehir=None, kar_kurak=0.0, kar_bol
         kat = kat * (kb & ~golb)[..., None]
         rgb = rgb * (1 - 0.85 * kat) + np.array([64, 116, 178]) * 0.85 * kat
     # kıyı çizgisi
-    kenar = kb ^ ndimage.binary_erosion(kb)
-    rgb = np.where(kenar[..., None], rgb * 0.55, rgb)
+    if kenar_ciz:
+        kenar = kb ^ ndimage.binary_erosion(kb)
+        rgb = np.where(kenar[..., None], rgb * 0.55, rgb)
     return Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8)), zb, kb
 
 

@@ -88,7 +88,7 @@ def main():
     ky, kx = Image.open(f"{ATLAS}/{kb['file']}").size[::-1]
     gy, gx = np.mgrid[0:ky, 0:kx].astype(np.float64)
     tr = gy * kb["sy"] + kb["oy"]; tc = gx * kb["sx"] + kb["ox"]
-    topo = ndimage.gaussian_filter(np.asarray(Image.open("cikti/topografya.png").convert("RGB")).astype(np.float32),
+    topo = ndimage.gaussian_filter(np.asarray(Image.open("cikti/topografya_duz.png").convert("RGB")).astype(np.float32),
                                    (0.45 * kb["sx"] / sx, 0.45 * kb["sx"] / sx, 0))
     kab = np.stack([ndimage.map_coordinates(topo[..., k], [(tr - oy) / sy, (tc - ox) / sx], order=1, mode="nearest")
                     for k in range(3)], -1)
