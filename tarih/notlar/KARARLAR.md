@@ -64,3 +64,8 @@ Atlas çözünürlüğünde 92 satırın her birinde tepe 3099 ile 3782 m (medya
 Atlas enleminde 2,5°G ile 12,5°K arası tam, 10°G ve 20°K'ye doğru doğrusal sönen, kıyıdan 140 km içeriye kadar artan, 1000 m üstü dağlara
 eklenmeyen yaklaşık 480 m'lik kubbe (benzer.py EKVATOR). Atlasta bant karası: ortanca 236'dan 644 m'ye, p10 36'dan 136 m'ye. 20°K kuzeyinde
 en büyük fark 0,1 m; batı sırtı kutusunda 0; kara maskesi farkı 0. Hikâyede 15 MYÖ "Güney kubbesi".
+
+## Kaynak Sırası S biçimli hat, Mavi Dağlar doğallaştı (sahibin isteği)
+Kaynak Sırası sahibin çizdiği S hattında: atlasta 49,5°K 5,8°D'den 38,2°K 4,8°B'ye; kuzey yarısında tepe 2950 ile 3100 m, dibe doğru
+incelerek ve alçalarak 800 m'ye iner. Önceki 36 ile 44°K arası kesintisiz sırt (gedik kapatma) bununla geçersiz; bozkır yeniden ölçülmeli.
+Mavi Dağlar: Ural şeridi yerine kıvrımlı Apalaş sırtları (tepe 850 ile 1200 m) ve çevresiyle hafif kabartı (kuzeyde 150, güneyde 350 m).

@@ -35,6 +35,14 @@ KARSILIK = [
         "nokta": [(105, 470, 7.0, 58.0), (190, 105, 25.8, 71.1), (800, 110, 59.2, 65.0), (808, 520, 58.3, 54.2)],
         "bolge": [(0, 0), (870, 0), (875, 300), (880, 600), (860, 620), (600, 720), (560, 960), (400, 880), (260, 880), (170, 795), (90, 775), (0, 725)],
     },
+    {   # Mavi Dağlar: 430 milyon yıllık 1 ile 2 dikişi. Düz Ural şeridi yerine kıvrımlı, yaşlı Apalaş sırtları (sahibin çizdiği hat).
+        "ad": "Mavi", "kutu": (-90, -72, 32, 44), "parca": {"1", "2"}, "oncelik": 2.5, "yumusak_km": 45,
+        "etiket": [],
+        "nokta": [(793, 139, -76.3, 41.6), (808, 228, -78.6, 39.6), (822, 312, -80.6, 37.9), (833, 407, -82.9, 36.2),
+                  (840, 512, -85.6, 34.4)],
+        "bolge": [(760, 110), (830, 110), (850, 230), (868, 320), (878, 410), (885, 520), (800, 530), (790, 410), (775, 320),
+                  (760, 230)],
+    },
     {   # 2'nin kuzeyi ve ortası: Orta Sibirya; Putorana = Kuzey Tuzakları, Baykal = Derin Göl, Sayanlar = Uzak Sıra
         "ad": "Sibirya", "kutu": (60, 140, 44, 78), "parca": {"2", "serit"},
         "etiket": [("Derin Göl", 110.6, 54.6, 15), ("UZAK SIRA", 96.5, 52.6, 17), ("Boz Kalkan", 110.0, 64.0, 16)],
@@ -60,14 +68,12 @@ KARSILIK = [
         "ad": "Kaynak", "kutu": (35, 51, 39, 47.5), "parca": {"2"}, "oncelik": 4.0, "yumusak_km": 35, "bukme_kat": 0.0,
         "yukseklik_egri": [(0, 0), (1000, 900), (2500, 2150), (4000, 3000), (5700, 3500)],
         "etiket": [("KAYNAK SIRASI", 42.4, 43.35, 14)],
-        # sahibin çizdiği yön: Çanak Sıraları'nın batı ucundan güneybatıya inen kol (görüntü pikseli)
-        "nokta": [(905, 452, 37.6, 44.8), (957, 362, 40.6, 43.7), (1005, 297, 43.6, 42.95), (1045, 258, 45.6, 42.3),
-                  (1078, 235, 47.5, 41.5), (1115, 215, 49.2, 40.8)],
-        "bolge": [(895.6, 392), (930, 330), (990, 255), (1060, 200), (1130, 180), (1145, 235), (1080, 280), (1020, 340),
-                  (984, 392)],
-        # eşlemenin çapa kutusu önceki bölgeden: 44°K kuzeyindeki doku kıpırdamasın
-        "capa_bolge": [(880, 420), (930, 330), (990, 255), (1060, 200), (1130, 180), (1145, 235), (1080, 280), (1020, 340),
-                       (975, 405), (935, 485), (880, 480)],
+        # sahibin çizdiği S biçimli hat (görüntü pikseli): Çanak Sıraları'ndan güneybatıya, dibe doğru incelerek ve alçalarak.
+        # Kafkas ters yönde: alçak ve ince batı ucu (Anapa) sıranın dibinde.
+        "nokta": [(1150, 241, 48.6, 41.2), (1108, 291, 47.0, 41.8), (1077, 333, 45.4, 42.4), (1055, 386, 43.8, 42.9),
+                  (1024, 438, 42.2, 43.35), (977, 475, 40.2, 43.9), (908, 498, 37.6, 44.8)],
+        "bolge": [(1120, 205), (1190, 225), (1150, 300), (1110, 350), (1090, 410), (1050, 470), (990, 515), (900, 525),
+                  (890, 480), (960, 445), (1000, 405), (1025, 345), (1065, 280)],
     },
     {   # Mor Sıradağları: yalnız dar sıra şeridi; karşılığı aynalanmış Himalaya'nın ön kuşağı (arkasındaki yayla dahil değil),
         # yükseklik 6 km dolayına ölçekli. Çanak bölgesinin üstüne baskın yazılır.
@@ -305,27 +311,29 @@ def tasarla(z, kara, s, doku):
 
 GOL = None
 # Kaynak Sırası: dokunun altına geniş ve alçak kabartı (boşluk kalmasın); doruklar yumuşak sınırla 3500 m dolayında tutulur
-SIRT_TABAN = {"cizgi": [(905, 452), (957, 362), (1005, 297), (1045, 258), (1078, 235), (1115, 215)],
-              "kabarti": 900.0,
-              "yari_km": 65.0, "ust": 3750.0}
+SIRT_TABAN = {"cizgi": [(1150, 241), (1108, 291), (1077, 333), (1055, 386), (1024, 438), (977, 475), (908, 498)],
+              # kuzeydoğudan güneybatıya: kabartı ve yarı genişlik dibe doğru azalır (sıra incelerek biter)
+              "kabarti": [900, 900, 850, 700, 500, 300, 120], "yari_km": [60, 60, 55, 48, 40, 32, 25], "ust": 3750.0}
 
 
 def sirt_taban(z, kara, s):
     from scipy.spatial import cKDTree
     c = np.array(SIRT_TABAN["cizgi"], float)
-    pts = np.vstack([c[i] + (c[i + 1] - c[i]) * t for i in range(len(c) - 1) for t in np.linspace(0, 1, 80)[:, None]]) * s
+    n = 80
+    pts = np.vstack([c[i] + (c[i + 1] - c[i]) * t for i in range(len(c) - 1) for t in np.linspace(0, 1, n)[:, None]]) * s
+    def boyunca(v):
+        v = np.array(v, float)
+        return np.concatenate([v[i] + (v[i + 1] - v[i]) * np.linspace(0, 1, n) for i in range(len(v) - 1)])
+    A = boyunca(SIRT_TABAN["kabarti"]); Wk = boyunca(SIRT_TABAN["yari_km"])
     ny, nx = z.shape
     r0, r1 = max(int(c[:, 1].min() * s) - 250, 0), min(int(c[:, 1].max() * s) + 250, ny)
     c0, c1 = max(int(c[:, 0].min() * s) - 250, 0), min(int(c[:, 0].max() * s) + 250, nx)
     yy, xx = np.mgrid[r0:r1, c0:c1]
     d, i = cKDTree(pts).query(np.stack([xx.ravel(), yy.ravel()], 1))
-    d = d.reshape(xx.shape) * O.KM_PX / s
-    # uçlarda sönsün (kuzey ve güney ucu doğal biter)
-    # uçlarda sön (önceki sürümle aynı); 44°K'nin güneyinde bu kabartı yok, oradan SIRT_GUNEY devralır (birleşme için 44,3°K'ye kadar geçiş)
-    t = (i.reshape(xx.shape) / (len(pts) - 1))
-    uc = np.clip(t / 0.04, 0, 1) * np.clip((1 - t) / 0.04, 0, 1)
-    uc = uc * np.clip((372 - yy / s) / 14, 0, 1)
-    k = SIRT_TABAN["kabarti"] * np.exp(-(d / SIRT_TABAN["yari_km"]) ** 2) * uc
+    d = d.reshape(xx.shape) * O.KM_PX / s; i = i.reshape(xx.shape)
+    t = i / (len(pts) - 1)
+    uc = np.clip(t / 0.03, 0, 1) * np.clip((1 - t) / 0.06, 0, 1)
+    k = A[i] * np.exp(-(d / Wk[i]) ** 2) * uc
     alt = z[r0:r1, c0:c1] + k
     u = SIRT_TABAN["ust"] - 300
     alt = np.where(alt > u, u + 300 * np.tanh((alt - u) / 300), alt)
@@ -338,6 +346,7 @@ def sirt_taban(z, kara, s):
 # Kaynak Sırası'nın 44°K ile 36°K arası (atlas oturumunun kararı: gedik kapansın, kesim en az 3000 m, genişlik kuzeyle aynı,
 # hat 44°K 2,7°B ile 36°K 3,6°B arası). Doku Kafkas'ın yüksek orta bölümünden (ters yönde); kıyı alçaltmasından sonra uygulanır ki sıra kıyıya kadar yüksek kalsın.
 SIRT_GUNEY = {
+    "etkin": False,  # sahip sırtı S biçimli hatta taşıdı ve dibe doğru incelmesini istedi; bu kesim artık kullanılmıyor
     "cizgi": [(955, 365), (950, 410), (944, 456), (939, 501), (934, 549)],
     "karsilik": {"ad": "KafkasGüney", "kutu": (38, 50, 39.5, 46), "bolge": [(0, 0)],
                  "yukseklik_egri": [(0, 0), (1000, 900), (2500, 2150), (4000, 3000), (5700, 3500)],
@@ -398,6 +407,24 @@ def ekvator_kalkan(z, kara, s):
     g = ndimage.zoom(g / g.std(), (ny / g.shape[0], nx / g.shape[1]), order=1)[:ny, :nx]
     yuk = e["genlik"] * U * R * H * (1 + 0.25 * np.clip(g, -2, 2))   # kubbe düz olmasın
     return np.where(kara, z + yuk, z)
+
+
+# Mavi Dağlar ve çevresi Mor çarpışmasından az etkilenip hafifçe kabarır: kuzeyde yaklaşık 150 m, güneyde (Mor'a yakın) 350 m
+MAVI = {"cizgi": [(793, 139), (808, 228), (822, 312), (833, 407), (840, 512)], "kabarti": [150, 190, 240, 300, 350], "yari_km": 160.0}
+
+
+def mavi_kabarti(z, kara, s):
+    from scipy.spatial import cKDTree
+    c = np.array(MAVI["cizgi"], float); n = 60
+    pts = np.vstack([c[i] + (c[i + 1] - c[i]) * t for i in range(len(c) - 1) for t in np.linspace(0, 1, n)[:, None]]) * s
+    v = np.array(MAVI["kabarti"], float)
+    A = np.concatenate([v[i] + (v[i + 1] - v[i]) * np.linspace(0, 1, n) for i in range(len(v) - 1)])
+    ny, nx = z.shape
+    yy, xx = np.mgrid[0:ny:4, 0:nx:4]
+    d, i = cKDTree(pts).query(np.stack([xx.ravel(), yy.ravel()], 1))
+    k = (A[i] * np.exp(-(d * O.KM_PX / s / MAVI["yari_km"]) ** 2)).reshape(xx.shape)
+    k = ndimage.zoom(k, (ny / k.shape[0], nx / k.shape[1]), order=1)[:ny, :nx]
+    return np.where(kara, z + k, z)
 
 
 MOR_SIRT = [(1075, 615), (1150, 562), (1300, 562), (1500, 614), (1715, 674), (1870, 700)]
@@ -475,6 +502,7 @@ def bilesik():
     z = np.where(z > 850, 850 + (z - 850) * (1 - 0.75 * Wl), z)
     z = on_ova(z, kara, s, lab, adlar)
     z = sirt_taban(z, kara, s)
+    z = mavi_kabarti(z, kara, s)
     if TASARIM.get("etkin"):
         k_t = TASARIM["doku"]
         im = Image.new("L", (nx, ny), 0)
@@ -487,7 +515,8 @@ def bilesik():
     dk = ndimage.distance_transform_edt(kara) * O.KM_PX / s
     u = np.clip(dk / 45.0, 0, 1)
     z = z * (0.3 + 0.7 * u * u * (3 - 2 * u))
-    z = sirt_guney(z, kara, s, kaynaklar)
+    if SIRT_GUNEY.get("etkin", True):
+        z = sirt_guney(z, kara, s, kaynaklar)
     z = ekvator_kalkan(z, kara, s)
     z = np.where(kara, np.maximum(z, 1.0), 0.0)
     np.save(f"{CIKTI}/benzer_z.npy", z.astype(np.float32))
