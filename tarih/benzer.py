@@ -378,9 +378,10 @@ def guney_yarimada(z, kara, s):
 
 GOL = None
 # Kaynak Sırası: dokunun altına geniş ve alçak kabartı (boşluk kalmasın); doruklar yumuşak sınırla 3500 m dolayında tutulur
-SIRT_TABAN = {"cizgi": [(1150, 241), (1108, 291), (1077, 333), (1055, 386), (1024, 438), (977, 475), (908, 498)],
-              # kuzeydoğudan güneybatıya: kabartı ve yarı genişlik dibe doğru azalır (sıra incelerek biter)
-              "kabarti": [900, 900, 850, 700, 500, 300, 120], "yari_km": [60, 60, 55, 48, 40, 32, 25], "ust": 3750.0}
+SIRT_TABAN = {"cizgi": [(1150, 241), (1108, 291), (1077, 333), (1055, 386), (1050, 423), (1003, 451), (961, 475), (929, 491), (910, 499)],
+              # sahibin isteği: güney kesim çizdiği hatta yaklaşık 3000 m, ucu ince biter
+              "kabarti": [900, 900, 850, 850, 1500, 1750, 1650, 1100, 250], "yari_km": [60, 60, 55, 50, 46, 42, 36, 24, 10],
+              "ust": 3750.0}
 
 
 def sirt_taban(z, kara, s):
@@ -474,6 +475,47 @@ def ekvator_kalkan(z, kara, s):
     g = ndimage.zoom(g / g.std(), (ny / g.shape[0], nx / g.shape[1]), order=1)[:ny, :nx]
     yuk = e["genlik"] * U * R * H * (1 + 0.25 * np.clip(g, -2, 2))   # kubbe düz olmasın
     return np.where(kara, z + yuk, z)
+
+
+# Kaynak Sırası'nın güney uzantısına doku: Kafkas'ın yüksek orta bölümü (yalnız 25 km'den küçük sırt ve vadiler eklenir)
+KAYNAK_DOKU = {"ad": "KafkasOrta", "kutu": (39, 49, 40.5, 45), "bolge": [(1060, 400), (1060, 520), (890, 520), (890, 400)],
+               "nokta": [(1050, 423, 45.6, 42.4), (1003, 451, 44.0, 42.9), (961, 475, 42.6, 43.2), (929, 491, 41.6, 43.4), (910, 499, 40.8, 43.7)]}
+
+
+def kaynak_guney_doku(z, kara, s):
+    from scipy.spatial import cKDTree
+    ny, nx = z.shape; hk = O.KM_PX / s
+    c = np.array([p[:2] for p in KAYNAK_DOKU["nokta"]], float)
+    pts = np.vstack([c[i] + (c[i + 1] - c[i]) * t for i in range(len(c) - 1) for t in np.linspace(0, 1, 60)[:, None]]) * s
+    x0, y0 = (pts.min(0) - 120).astype(int); x1, y1 = (pts.max(0) + 120).astype(int)
+    yy, xx = np.mgrid[y0:y1, x0:x1]
+    d, i = cKDTree(pts).query(np.stack([xx.ravel(), yy.ravel()], 1))
+    d = d.reshape(xx.shape) * hk; t = (i / (len(pts) - 1)).reshape(xx.shape)
+    genis = 55 * (1 - 0.75 * t)
+    w = np.clip((genis - d) / (0.6 * genis), 0, 1) * np.clip(t / 0.15, 0, 1)
+    m = np.zeros((ny, nx), np.float32); m[y0:y1, x0:x1] = d < 80
+    A, _ = ornekle(KAYNAK_DOKU, ny, nx, s, m, {}, None)
+    A = A[y0:y1, x0:x1]
+    ince = A - ndimage.gaussian_filter(A, 25 / hk)
+    z = z.copy()
+    z[y0:y1, x0:x1] = np.where(kara[y0:y1, x0:x1], z[y0:y1, x0:x1] + 0.9 * ince * w * (1 - 0.6 * t), z[y0:y1, x0:x1])
+    return z
+
+
+# Kaynak Sırası çevresindeki büyük çukurlar (kaynaktaki alçak ovalar ve göl yerleri): bölgesel düzeyin 150 m altına kadar doldurulur
+CUKUR = {"bolge": [(860, 230), (1180, 230), (1180, 560), (860, 560)], "olcek_km": 90.0, "pay": 150.0}
+
+
+def cukur_doldur(z, kara, s):
+    ny, nx = z.shape; hk = O.KM_PX / s
+    im = Image.new("F", (nx, ny), 0.0)
+    ImageDraw.Draw(im).polygon([(x * s, y * s) for x, y in CUKUR["bolge"]], fill=1.0)
+    W = ndimage.gaussian_filter(np.asarray(im), 40 / hk)
+    k = kara.astype(float)
+    duz = ndimage.gaussian_filter(np.where(kara, z, 0.0), CUKUR["olcek_km"] / hk) / np.maximum(ndimage.gaussian_filter(k, CUKUR["olcek_km"] / hk), 1e-3)
+    taban = duz - CUKUR["pay"]
+    yeni = np.where(z < taban, taban - 0.3 * (taban - z) ** 0.8, z)   # çukurun içi tamamen düzleşmesin
+    return np.where(kara, z * (1 - W) + np.maximum(yeni, z) * W, z)
 
 
 # Mavi Dağlar ve çevresi Mor çarpışmasından az etkilenip hafifçe kabarır: kuzeyde yaklaşık 150 m, güneyde (Mor'a yakın) 350 m
@@ -616,6 +658,8 @@ def bilesik():
     z = np.where(z > 850, 850 + (z - 850) * (1 - 0.75 * Wl), z)
     z = on_ova(z, kara, s, lab, adlar)
     z = sirt_taban(z, kara, s)
+    z = cukur_doldur(z, kara, s)
+    z = kaynak_guney_doku(z, kara, s)
     z = ural_bastir(z, kara, s)
     z = mavi_kabarti(z, kara, s)
     z = sari_uc(z, kara, s)
