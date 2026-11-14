@@ -113,8 +113,10 @@ KARSILIK = [
     },
     {   # 4'ün doğusu ve 5: Zagros = Sarı Sıradağları, Mezopotamya ve Basra = Sarı Ön Havzası, Orta İran = 4'ün doğu yaylası
         "ad": "İran", "kutu": (32, 66, 16, 42), "parca": {"4", "5"},
-        "etiket": [("SARI SIRADAĞLARI", 51.5, 30.6, 15), ("Sarı Ön Havzası", 48.5, 29.0, 14), ("Tuz Çölü", 54.5, 34.3, 14)],
+        "etiket": [("SARI SIRADAĞLARI", 51.5, 30.6, 15), ("Sarı Ön Havzası", 48.5, 29.0, 14)],
         "nokta": [(748, 1370, 45.5, 35.6), (730, 1180, 51.4, 30.9), (785, 975, 56.3, 27.4)],
+        # Zagros kıvrım kuşağı Sarı çizgisi boyunca tam yükseklikte; gerisindeki Orta İran yaylası yerinde ama kabartısı yarıya iner
+        # (SARI_UC), böylece kalp biçimli kütle yerine dar bir sıra ve alçak, parçalı bir iç yayla olur. Uçlar kıyıya yaklaşırken alçalır.
         "bolge": [(500, 900), (620, 940), (820, 920), (900, 960), (960, 1060), (920, 1120), (900, 1300), (760, 1430), (640, 1400), (560, 1250), (500, 1100)],
     },
     {   # 6: Ege; Yunanistan ve Batı Anadolu, yay ardı gerilmesinin parmak yarımadaları
@@ -427,6 +429,36 @@ def mavi_kabarti(z, kara, s):
     return np.where(kara, z + k, z)
 
 
+# Sarı Sıradağları'nın uçları: kuzeyde iç denize, güneyde okyanusa yaklaşırken alçalır (kıyıya dik kesilmiş görünmesin)
+SARI = {"cizgi": [(800, 930), (785, 965), (755, 1005), (735, 1060), (725, 1130), (722, 1200), (728, 1250), (745, 1330), (755, 1400)],
+        "serit_km": 110.0, "kuzey": (925, 1070), "guney": (1290, 1420), "en_az": 0.3, "taban": 350.0,
+        "yayla": [(500, 900), (620, 940), (760, 930), (700, 1060), (690, 1200), (700, 1340), (640, 1400), (560, 1250), (500, 1100)],
+        "yayla_kat": 0.5}
+
+
+def sari_uc(z, kara, s):
+    from scipy.spatial import cKDTree
+    g = SARI
+    c = np.array(g["cizgi"], float)
+    pts = np.vstack([c[i] + (c[i + 1] - c[i]) * t for i in range(len(c) - 1) for t in np.linspace(0, 1, 40)[:, None]]) * s
+    ny, nx = z.shape
+    yy, xx = np.mgrid[0:ny:4, 0:nx:4]
+    d, _ = cKDTree(pts).query(np.stack([xx.ravel(), yy.ravel()], 1))
+    W = np.clip((g["serit_km"] - d.reshape(xx.shape) * O.KM_PX / s) / 60, 0, 1)
+    W = ndimage.zoom(W, (ny / W.shape[0], nx / W.shape[1]), order=1)[:ny, :nx]
+    y = np.arange(ny)[:, None] / s
+    k0, k1 = g["kuzey"]; g0, g1 = g["guney"]
+    f = np.clip((y - k0) / (k1 - k0), 0, 1) * np.clip((g1 - y) / (g1 - g0), 0, 1)
+    f = g["en_az"] + (1 - g["en_az"]) * f * f * (3 - 2 * f)
+    b = g["taban"]
+    z = np.where(kara & (z > b), b + (z - b) * (1 - W * (1 - f)), z)
+    # Orta İran karşılığı (4'ün doğusu): şeridin dışında kabartı yarıya
+    im = Image.new("F", (nx, ny), 0.0)
+    ImageDraw.Draw(im).polygon([(x * s, y_ * s) for x, y_ in g["yayla"]], fill=1.0)
+    Y = ndimage.gaussian_filter(np.asarray(im), 50 / (O.KM_PX / s)) * (1 - W)
+    return np.where(kara & (z > b), b + (z - b) * (1 - Y * (1 - g["yayla_kat"])), z)
+
+
 MOR_SIRT = [(1075, 615), (1150, 562), (1300, 562), (1500, 614), (1715, 674), (1870, 700)]
 
 
@@ -503,6 +535,7 @@ def bilesik():
     z = on_ova(z, kara, s, lab, adlar)
     z = sirt_taban(z, kara, s)
     z = mavi_kabarti(z, kara, s)
+    z = sari_uc(z, kara, s)
     if TASARIM.get("etkin"):
         k_t = TASARIM["doku"]
         im = Image.new("L", (nx, ny), 0)
