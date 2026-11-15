@@ -1,0 +1,22 @@
+{
+ "boyut": [
+  8192,
+  4096
+ ],
+ "projeksiyon": "eşdikdörtgen, tüm dünya; Merak'ta Fill world",
+ "kita": {
+  "enlem": [
+   -5.03,
+   49.99
+  ],
+  "boylam": [
+   -42.91,
+   44.93
+  ],
+  "merkez_boylam": 0.0
+ },
+ "kodlama": "gri = 0,22 + 0,78 × m / 5600 (kara); gri = 0,22 × (1 − m / -7515) (deniz)",
+ "deniz_seviyesi_gri": 0.22,
+ "en_yuksek_m": 5600,
+ "en_derin_m": -7515
+}
