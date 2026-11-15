@@ -1,0 +1,19 @@
+{
+ "boyut": [
+  3808,
+  2914
+ ],
+ "piksel_km": 2.101,
+ "dunyam_yukseklik_16bit.png": {
+  "deniz": 0,
+  "metre": "değer / 65535 × 5715",
+  "en_yuksek_m": 5715
+ },
+ "dunyam_yukseklik_batimetri_16bit.png": {
+  "deniz_seviyesi_degeri": 37224,
+  "metre": "değer / 65535 × 13230 − 7515",
+  "en_derin_m": -7515,
+  "en_yuksek_m": 5715
+ },
+ "dunyam_maske.png": "beyaz kara, siyah deniz; sahibin maskesiyle aynı"
+}
