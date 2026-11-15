@@ -1,7 +1,7 @@
 """Merak için tüm dünya (eşdikdörtgen, 2:1) görselleri: kıta bizim ölçeğimizle doğru enlem ve boylamlara oturtulur.
 
-Bizim harita: 8000 km genişlik, üst kenar 50°K, alt kenar yaklaşık 5,07°G (1 görüntü pikseli = 4 km). Her enlemde boylam açıklığı
-x_km / (111,32 × cos enlem) ile hesaplanır, yani kıta kuzeye doğru eşdikdörtgen projeksiyonda genişler (küre üzerinde doğru şekil).
+Bizim harita: 8000 km genişlik, üst kenar 50°K, alt kenar yaklaşık 5,07°G (1 görüntü pikseli = 4 km). Harita bükülmeden, oranı korunarak konur
+(sahibin isteği): bir maske pikseli enlemde ve boylamda aynı derece.
 Kıtanın ortası MERKEZ_BOYLAM'da. Merak'ta "Fill world" ile yerleştirilir.
 Kodlama (Merak): siyah deniz tabanı, beyaz en yüksek, deniz seviyesi %22 gri.
 """
@@ -29,8 +29,10 @@ def main():
     satir = (50 - lat) * 111.2 / km_px                 # maske satırı
     zz = np.where(kara, np.maximum(z, 1.0), np.minimum(zt, -5.0))
     yuk = np.full((H, W), np.nan, np.float32); mk = np.zeros((H, W), bool)
+    # düz yerleşim (sahibin isteği): harita bükülmeden konur; enlem 50°K ile 5°G, boylam açıklığı oran korunarak (her satırda aynı)
+    der_px = (50 - (50 - my * km_px / 111.2)) / my      # maske pikseli başına derece (enlem ve boylamda aynı)
     for i in np.nonzero((satir >= 0) & (satir <= my - 1))[0]:
-        sutun = (lon - MERKEZ_BOYLAM) * 111.32 * np.cos(np.radians(lat[i])) / km_px + mx / 2
+        sutun = (lon - MERKEZ_BOYLAM) / der_px + mx / 2
         ok = (sutun >= 0) & (sutun <= mx - 1)
         if not ok.any():
             continue
