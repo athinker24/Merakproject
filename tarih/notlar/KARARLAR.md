@@ -81,3 +81,7 @@ Mavi Dağlar: Ural şeridi yerine kıvrımlı Apalaş sırtları (tepe 850 ile 1
   kara yükseklikleri altıncı denemenin (d673c2f) değerlerine geri getirildi; atlas_yama.py, kutu içinde 4 piksellik geçiş. Kutu dışı fark 0.
   Bu yama yalnız atlas dosyalarında; benzer.py'nin ürettiği tarih haritası dokuzuncu denemenin S biçimli sırtını göstermeye devam ediyor.
   44°K'de düz sırt 2,7°B'de, kuzeydeki S sırtı 2,0°D'de: iki sırt birleşmiyor, arada yaklaşık 4,7° boylamlık açıklık var.
+- 15 Kasım (onuncu deneme yerine): kutu yaması şekli bozduğu için tarih aracında birleştirildi. Kaynak Sırası artık tek parça:
+  kuzey kol Çanak Sıraları'ndan güneybatıya iner, 44°K dolayında yayla güneye döner; 36 ile 44°K arası altıncı denemenin hattı ve
+  dokusu (SIRT_GUNEY yeniden açık). Atlasta 36-44°K tepeler 3274 ile 3678 m, boylam 3,5°B ile 2,7°B, 2000 m üstü genişlik 0,97 ile 1,76°;
+  altıncı denemeden kutu içinde ortalama fark 75 m. atlas_yama.py ile yapılan yama bununla geçersiz.

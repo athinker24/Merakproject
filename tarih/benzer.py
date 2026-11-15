@@ -69,12 +69,12 @@ KARSILIK = [
         "ad": "Kaynak", "kutu": (35, 51, 39, 47.5), "parca": {"2"}, "oncelik": 4.0, "yumusak_km": 35, "bukme_kat": 0.0,
         "yukseklik_egri": [(0, 0), (1000, 900), (2500, 2150), (4000, 3000), (5700, 3500)],
         "etiket": [("KAYNAK SIRASI", 42.4, 43.35, 14)],
-        # sahibin çizdiği S biçimli hat (görüntü pikseli): Çanak Sıraları'ndan güneybatıya, dibe doğru incelerek ve alçalarak.
-        # Kafkas ters yönde: alçak ve ince batı ucu (Anapa) sıranın dibinde.
-        "nokta": [(1150, 241, 48.6, 41.2), (1108, 291, 47.0, 41.8), (1077, 333, 45.4, 42.4), (1055, 386, 43.8, 42.9),
-                  (1024, 438, 42.2, 43.35), (977, 475, 40.2, 43.9), (908, 498, 37.6, 44.8)],
-        "bolge": [(1120, 205), (1190, 225), (1150, 300), (1110, 350), (1090, 410), (1050, 470), (990, 515), (900, 525),
-                  (890, 480), (960, 445), (1000, 405), (1025, 345), (1065, 280)],
+        # kuzey kol: Çanak Sıraları'ndan güneybatıya iner, 44°K dolayında güneye döner; güney kesimi SIRT_GUNEY sürdürür
+        # (işlev: atlas denemelerinde bozkırı 36 ile 44°K arasında yaklaşık 3°B'deki 3400 m üstü sırt sağlıyor)
+        "nokta": [(1150, 241, 48.6, 41.2), (1108, 291, 47.0, 41.8), (1068, 322, 45.6, 42.3), (1020, 342, 44.2, 42.75),
+                  (982, 356, 43.2, 43.0), (958, 372, 42.4, 43.2)],
+        "bolge": [(1120, 205), (1190, 225), (1150, 300), (1080, 345), (1010, 372), (975, 395), (928, 392), (940, 350),
+                  (1000, 322), (1065, 280)],
     },
     {   # Mor Sıradağları: yalnız dar sıra şeridi; karşılığı aynalanmış Himalaya'nın ön kuşağı (arkasındaki yayla dahil değil),
         # yükseklik 6 km dolayına ölçekli. Çanak bölgesinin üstüne baskın yazılır.
@@ -378,13 +378,9 @@ def guney_yarimada(z, kara, s):
 
 GOL = None
 # Kaynak Sırası: dokunun altına geniş ve alçak kabartı (boşluk kalmasın); doruklar yumuşak sınırla 3500 m dolayında tutulur
-SIRT_TABAN = {"cizgi": [(1150, 241), (1108, 291), (1077, 333), (1055, 386), (1050, 423), (1003, 451), (961, 475), (929, 491), (908, 503),
-                         (900, 518), (896, 533), (893, 545)],
-              # sahibin isteği: güney kesim çizdiği hatta yaklaşık 3000 m, ucu ince biter
-              # güney ucu kıyıdaki yükseltiye bağlanır: yağmurun ucun yanından çanağa girdiği açıklık kapanır
-              "kabarti": [900, 900, 850, 850, 1500, 1750, 1750, 2000, 2300, 2100, 1400, 400],
-              "yari_km": [60, 60, 55, 50, 46, 42, 38, 36, 34, 30, 24, 14],
-              "ust": 3750.0}
+SIRT_TABAN = {"cizgi": [(1150, 241), (1108, 291), (1068, 322), (1020, 342), (982, 356), (958, 372)],
+              "kabarti": [900, 900, 900, 950, 1000, 1000], "yari_km": [60, 60, 56, 52, 50, 48], "ust": 3750.0,
+              "son_incel": False}   # güney ucu incelmez: SIRT_GUNEY kesintisiz devam eder
 
 
 def sirt_taban(z, kara, s):
@@ -403,7 +399,7 @@ def sirt_taban(z, kara, s):
     d, i = cKDTree(pts).query(np.stack([xx.ravel(), yy.ravel()], 1))
     d = d.reshape(xx.shape) * O.KM_PX / s; i = i.reshape(xx.shape)
     t = i / (len(pts) - 1)
-    uc = np.clip(t / 0.03, 0, 1) * np.clip((1 - t) / 0.06, 0, 1)
+    uc = np.clip(t / 0.03, 0, 1) * (np.clip((1 - t) / 0.06, 0, 1) if SIRT_TABAN.get("son_incel", True) else 1.0)
     k = A[i] * np.exp(-(d / Wk[i]) ** 2) * uc
     alt = z[r0:r1, c0:c1] + k
     u = SIRT_TABAN["ust"] - 300
@@ -417,11 +413,11 @@ def sirt_taban(z, kara, s):
 # Kaynak Sırası'nın 44°K ile 36°K arası (atlas oturumunun kararı: gedik kapansın, kesim en az 3000 m, genişlik kuzeyle aynı,
 # hat 44°K 2,7°B ile 36°K 3,6°B arası). Doku Kafkas'ın yüksek orta bölümünden (ters yönde); kıyı alçaltmasından sonra uygulanır ki sıra kıyıya kadar yüksek kalsın.
 SIRT_GUNEY = {
-    "etkin": False,  # sahip sırtı S biçimli hatta taşıdı ve dibe doğru incelmesini istedi; bu kesim artık kullanılmıyor
-    "cizgi": [(955, 365), (950, 410), (944, 456), (939, 501), (934, 549)],
+    "etkin": True,   # 15 Kasım: işlev için geri açıldı; kuzey kolla 44°K dolayında birleşir
+    "cizgi": [(958, 368), (950, 410), (946, 456), (940, 501), (934, 549)],
     "karsilik": {"ad": "KafkasGüney", "kutu": (38, 50, 39.5, 46), "bolge": [(0, 0)],
                  "yukseklik_egri": [(0, 0), (1000, 900), (2500, 2150), (4000, 3000), (5700, 3500)],
-                 "nokta": [(955, 365, 47.3, 41.6), (950, 410, 46.0, 42.2), (944, 456, 44.6, 42.7), (939, 501, 43.3, 43.0),
+                 "nokta": [(958, 368, 47.3, 41.6), (950, 410, 46.0, 42.2), (946, 456, 44.6, 42.7), (940, 501, 43.3, 43.0),
                            (934, 549, 41.8, 43.4)]},
     "kabarti": 1250.0, "yari_km": 55.0, "serit_km": 150.0, "taban": 2700.0, "taban_km": 22.0, "ust": 3800.0,
 }
@@ -663,7 +659,6 @@ def bilesik():
     z = on_ova(z, kara, s, lab, adlar)
     z = sirt_taban(z, kara, s)
     z = cukur_doldur(z, kara, s)
-    z = kaynak_guney_doku(z, kara, s)
     z = ural_bastir(z, kara, s)
     z = mavi_kabarti(z, kara, s)
     z = sari_uc(z, kara, s)
