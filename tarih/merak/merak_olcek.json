@@ -1,0 +1,18 @@
+{
+ "boyut": [
+  8000,
+  3859
+ ],
+ "kayit": {
+  "olcek_x": 0.6762117727396932,
+  "olcek_y": 0.6782460157004098,
+  "kayma_x": 2199.1021939734774,
+  "kayma_y": 462.1945923303143,
+  "not": "Merak pikseli (satır, sütun) = (maske satırı × olcek_y + kayma_y, maske sütunu × olcek_x + kayma_x)"
+ },
+ "ortusme": 0.9296446711272758,
+ "deniz_seviyesi_degeri": 37273,
+ "en_derin_m": -7514,
+ "en_yuksek_m": 5698,
+ "metre": "değer / 65535 × 13212 − 7514"
+}
