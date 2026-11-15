@@ -76,3 +76,4 @@ Mavi Dağlar: Ural şeridi yerine kıvrımlı Apalaş sırtları (tepe 850 ile 1
 - 3'ün güney yarımadası yarık omzu: Arabistan'ın Kızıldeniz kenarı karşılığı (benzer.py guney_yarimada). Kuyruklardaki sırtlar ertelendi.
 - Göller şimdilik çizilmiyor. Atlasta: kara maskesi aynı, batı sırtı kutusunda fark 0, ekvator bandı ortanca 655 m (önce 643), p10 99 m (önce 136).
 - Kaynak Sırası'nın güney kesimi sahibin çizdiği hatta uzatıldı ve yükseltildi: atlasta 44°K ile 39,2°K arası tepe 2840 ile 3700 m, ucu 38,3°K'de 1400 m'ye incelerek iner. Çevredeki büyük çukurlar bölgesel düzeye dolduruldu (cukur_doldur).
+- 15 Kasım: atlasta yağmur sırtın güney ucunun yanından çanağa giriyordu. Sırt güneybatıya, iç deniz kıyısındaki yükseltiye bağlanana kadar uzatıldı: atlasta 35,5 ile 45°K arasında her satırda batı kenarında en az 2340 m (36,5 ile 38,5°K arası 2630 ile 3330 m; önce 870 ile 2190 m).

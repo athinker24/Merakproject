@@ -378,9 +378,12 @@ def guney_yarimada(z, kara, s):
 
 GOL = None
 # Kaynak Sırası: dokunun altına geniş ve alçak kabartı (boşluk kalmasın); doruklar yumuşak sınırla 3500 m dolayında tutulur
-SIRT_TABAN = {"cizgi": [(1150, 241), (1108, 291), (1077, 333), (1055, 386), (1050, 423), (1003, 451), (961, 475), (929, 491), (910, 499)],
+SIRT_TABAN = {"cizgi": [(1150, 241), (1108, 291), (1077, 333), (1055, 386), (1050, 423), (1003, 451), (961, 475), (929, 491), (908, 503),
+                         (900, 518), (896, 533), (893, 545)],
               # sahibin isteği: güney kesim çizdiği hatta yaklaşık 3000 m, ucu ince biter
-              "kabarti": [900, 900, 850, 850, 1500, 1750, 1650, 1100, 250], "yari_km": [60, 60, 55, 50, 46, 42, 36, 24, 10],
+              # güney ucu kıyıdaki yükseltiye bağlanır: yağmurun ucun yanından çanağa girdiği açıklık kapanır
+              "kabarti": [900, 900, 850, 850, 1500, 1750, 1750, 2000, 2300, 2100, 1400, 400],
+              "yari_km": [60, 60, 55, 50, 46, 42, 38, 36, 34, 30, 24, 14],
               "ust": 3750.0}
 
 
@@ -479,7 +482,8 @@ def ekvator_kalkan(z, kara, s):
 
 # Kaynak Sırası'nın güney uzantısına doku: Kafkas'ın yüksek orta bölümü (yalnız 25 km'den küçük sırt ve vadiler eklenir)
 KAYNAK_DOKU = {"ad": "KafkasOrta", "kutu": (39, 49, 40.5, 45), "bolge": [(1060, 400), (1060, 520), (890, 520), (890, 400)],
-               "nokta": [(1050, 423, 45.6, 42.4), (1003, 451, 44.0, 42.9), (961, 475, 42.6, 43.2), (929, 491, 41.6, 43.4), (910, 499, 40.8, 43.7)]}
+               "nokta": [(1050, 423, 45.6, 42.4), (1003, 451, 44.0, 42.9), (961, 475, 42.6, 43.2), (929, 491, 41.6, 43.4), (908, 503, 40.8, 43.7),
+                         (898, 525, 40.0, 44.0), (893, 545, 39.4, 44.3)]}
 
 
 def kaynak_guney_doku(z, kara, s):
@@ -491,7 +495,7 @@ def kaynak_guney_doku(z, kara, s):
     yy, xx = np.mgrid[y0:y1, x0:x1]
     d, i = cKDTree(pts).query(np.stack([xx.ravel(), yy.ravel()], 1))
     d = d.reshape(xx.shape) * hk; t = (i / (len(pts) - 1)).reshape(xx.shape)
-    genis = 55 * (1 - 0.75 * t)
+    genis = 55 * (1 - 0.6 * t)
     w = np.clip((genis - d) / (0.6 * genis), 0, 1) * np.clip(t / 0.15, 0, 1)
     m = np.zeros((ny, nx), np.float32); m[y0:y1, x0:x1] = d < 80
     A, _ = ornekle(KAYNAK_DOKU, ny, nx, s, m, {}, None)
