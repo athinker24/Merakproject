@@ -40,10 +40,20 @@ def main():
         yuk[i, ok] = ndimage.map_coordinates(zz, [r, c], order=1)
         mk[i, ok] = ndimage.map_coordinates(kara.astype(np.float32), [r, c], order=1) > 0.5
     icerde = ~np.isnan(yuk)
-    w = ndimage.gaussian_filter(icerde.astype(np.float32), GEN / 200)
-    v = ndimage.gaussian_filter(np.where(icerde, yuk, 0), GEN / 200) / np.maximum(w, 1e-3)
-    dolgu = ndimage.gaussian_filter(np.where(w > 0.02, np.minimum(v, -200), -4200.0), GEN / 140)
-    h = np.where(icerde, yuk, dolgu)
+    # haritanın dışındaki deniz: kıyıdan uzaklığa bağlı sahanlık ve yamaç (gürültülü); harita kenarına 150 km kala bizim
+    # batimetriyle karıştırılır, böylece kutu kenarı düz bir çizgi olarak görünmez
+    km_y = 180 / H * 111.2
+    km_x = 360 / W * 111.2 * np.cos(np.radians(20))
+    d = ndimage.distance_transform_edt(~mk, sampling=(km_y, km_x))
+    rng = np.random.default_rng(7)
+    gur = ndimage.gaussian_filter(rng.standard_normal((H, W)).astype(np.float32), 120 / km_y)
+    gur /= gur.std() + 1e-6
+    d = d * (1 + 0.25 * np.clip(gur, -1.5, 1.5))
+    t = np.clip((d - 40) / 360, 0, 1); t = t * t * (3 - 2 * t)
+    profil = -80 - 3920 * t
+    ic = ndimage.distance_transform_edt(icerde, sampling=(km_y, km_x))
+    w = np.clip((ic - 20) / 150, 0, 1)
+    h = np.where(icerde, w * np.nan_to_num(yuk) + (1 - w) * profil, profil)
     h = np.where(mk, np.maximum(h, 1.0), np.minimum(h, -5.0))
     zmax, zmin = float(h.max()), float(h.min())
     g = np.where(h >= 0, DENIZ_GRI + (1 - DENIZ_GRI) * h / zmax, DENIZ_GRI * (1 - h / zmin))

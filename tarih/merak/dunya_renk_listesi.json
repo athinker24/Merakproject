@@ -1,0 +1,145 @@
+[
+ {
+  "sira": 1,
+  "ad": "Derin okyanus",
+  "renk": "#0A1E5A",
+  "metre": -4000,
+  "aralik_m": [
+   null,
+   -2500
+  ],
+  "pay_yuzde": 95.217
+ },
+ {
+  "sira": 2,
+  "ad": "Açık deniz",
+  "renk": "#1F5FB4",
+  "metre": -1590,
+  "aralik_m": [
+   -2500,
+   -600
+  ],
+  "pay_yuzde": 0.449
+ },
+ {
+  "sira": 3,
+  "ad": "Sığ / kıyı",
+  "renk": "#7FC8F0",
+  "metre": -80,
+  "aralik_m": [
+   -600,
+   0
+  ],
+  "pay_yuzde": 0.757
+ },
+ {
+  "sira": 4,
+  "ad": "Kıyı ovası",
+  "renk": "#1E8C3C",
+  "metre": 50,
+  "aralik_m": [
+   0,
+   100
+  ],
+  "pay_yuzde": 0.506
+ },
+ {
+  "sira": 5,
+  "ad": "Ova",
+  "renk": "#8CD25A",
+  "metre": 180,
+  "aralik_m": [
+   100,
+   300
+  ],
+  "pay_yuzde": 0.786
+ },
+ {
+  "sira": 6,
+  "ad": "Alçak yayla",
+  "renk": "#F0F046",
+  "metre": 450,
+  "aralik_m": [
+   300,
+   600
+  ],
+  "pay_yuzde": 0.647
+ },
+ {
+  "sira": 7,
+  "ad": "Yayla",
+  "renk": "#F0B428",
+  "metre": 800,
+  "aralik_m": [
+   600,
+   1000
+  ],
+  "pay_yuzde": 0.772
+ },
+ {
+  "sira": 8,
+  "ad": "Tepeler",
+  "renk": "#D2641E",
+  "metre": 1190,
+  "aralik_m": [
+   1000,
+   1500
+  ],
+  "pay_yuzde": 0.467
+ },
+ {
+  "sira": 9,
+  "ad": "Alçak dağ",
+  "renk": "#A01E1E",
+  "metre": 1700,
+  "aralik_m": [
+   1500,
+   2000
+  ],
+  "pay_yuzde": 0.183
+ },
+ {
+  "sira": 10,
+  "ad": "Dağ",
+  "renk": "#78288C",
+  "metre": 2310,
+  "aralik_m": [
+   2000,
+   2700
+  ],
+  "pay_yuzde": 0.13
+ },
+ {
+  "sira": 11,
+  "ad": "Yüksek dağ",
+  "renk": "#B482DC",
+  "metre": 2950,
+  "aralik_m": [
+   2700,
+   3400
+  ],
+  "pay_yuzde": 0.056
+ },
+ {
+  "sira": 12,
+  "ad": "Çok yüksek dağ",
+  "renk": "#505050",
+  "metre": 3730,
+  "aralik_m": [
+   3400,
+   4300
+  ],
+  "pay_yuzde": 0.029
+ },
+ {
+  "sira": 13,
+  "ad": "Zirveler",
+  "renk": "#FFFFFF",
+  "metre": 4410,
+  "aralik_m": [
+   4300,
+   null
+  ],
+  "pay_yuzde": 0.001
+ }
+]
