@@ -1,0 +1,32 @@
+{
+ "boyut": [
+  8000,
+  4000
+ ],
+ "kita_kutusu_px": [
+  3200,
+  889,
+  1601,
+  1223
+ ],
+ "enlem": [
+  -5.053,
+  50.0
+ ],
+ "boylam": [
+  -36.0,
+  36.045
+ ],
+ "kayit_iou": 0.9768,
+ "kayit": [
+  2.3786,
+  2.376,
+  1.8795,
+  1.4061
+ ],
+ "kodlama": "gri = 0,22 + 0,78 × m / 5693 (kara); gri = 0,22 × (1 − m / -4000) (deniz)",
+ "kara_yalniz": "v2_kita_kara_16bit: gri = m / 5693, deniz 0",
+ "en_yuksek_m": 5693,
+ "en_derin_m": -4000,
+ "maske_farki_px": 27619
+}
