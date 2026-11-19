@@ -1,0 +1,28 @@
+{
+ "bati": {
+  "en_yuksek_m": 3874,
+  "ortanca_m": 331,
+  "gri_ust_sinir_m": 2315,
+  "enlem": [
+   -5.04,
+   47.97
+  ],
+  "boylam": [
+   -36.0,
+   -1.03
+  ]
+ },
+ "ada": {
+  "en_yuksek_m": 2382,
+  "ortanca_m": 166,
+  "gri_ust_sinir_m": 1638,
+  "enlem": [
+   16.06,
+   26.32
+  ],
+  "boylam": [
+   -16.34,
+   -2.61
+  ]
+ }
+}
