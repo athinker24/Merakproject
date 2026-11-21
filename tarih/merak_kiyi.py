@@ -1,9 +1,11 @@
-"""Merak birleşik haritasında kıyı yüksekliklerinin düzeltilmesi: alçalan kıyı şeridi ve kıta sahanlığı. Kıyı çizgisi değişmez.
+"""Merak birleşik haritasında kıyı yüksekliklerinin düzeltilmesi: yalnız karada alçalan kıyı şeridi.
+Kıyı çizgisi ve deniz pikselleri değişmez (deniz derinliğini sahibi Merak'ta ayarlıyor).
 
 Ölçüm (birlesik_16k): kıyıdan 2,5 ile 10 km içeride kara ortancası 350 ile 430 m, iç kesimden (260 m) yüksek; deniz kıyıdan
 5 ile 15 km dışarıda −4300 m'ye iniyor (sahanlık yok). Bu ikisi kıyıları "yüksek" gösteriyor.
-Girdi/çıktı Merak kodlamasında (merak_birlestir.py). Kullanım: python3 merak_kiyi.py
+Girdi/çıktı Merak kodlamasında (merak_birlestir.py). Kullanım: python3 merak_kiyi.py GIRDI_16k.png CIKTI_ONEK
 """
+import sys
 import numpy as np
 from PIL import Image
 from scipy import ndimage
@@ -27,7 +29,7 @@ def deniz_kodla(m):
 
 
 def main():
-    g = np.asarray(Image.open("merak/birlesik_16k.png")).astype(np.int32)
+    g = np.asarray(Image.open(sys.argv[1])).astype(np.int32)
     H, W = g.shape
     E = coz(g)
     ys, xs = np.nonzero(E[:, W // 3:] > 0.5)
@@ -47,25 +49,13 @@ def main():
     ic = ndimage.uniform_filter(np.where(yeni, hl, 0), 25) / np.maximum(ndimage.uniform_filter(yeni.astype(np.float32), 25), 1e-3)
     hl = np.where(t < 1, np.minimum(hl, np.maximum(ic * (0.4 + 0.6 * t) + 30, hl * t)), hl)
     hl = np.maximum(hl, 2)
-    # 4) sahanlık ve yamaç
-    dsk = ndimage.distance_transform_edt(~yeni) * KM
-    sah = 45 * (1 + 0.7 * np.clip(gurultu(sh, [(50, 1)]), -1.1, 1.3))            # sahanlık genişliği 0 ile 100 km
-    sah = np.maximum(sah, 6)
-    derin_sah = -12 - 140 * np.clip(dsk / sah, 0, 1) ** 1.3
-    t2 = np.clip((dsk - sah) / 90, 0, 1); t2 = t2 * t2 * (3 - 2 * t2)
-    profil = derin_sah + (-4300 - derin_sah) * t2
-    profil = ndimage.gaussian_filter(profil, 8)                                  # uzaklık dönüşümünün sırt çizgilerini sil
-    eski_deniz = np.where(kara, -4300, h)
-    hs = np.maximum(eski_deniz, profil) + 6 * gurultu(sh, [(2, 1)]) * (dsk < sah)
-    hs = np.minimum(hs, -3)
     out = g.copy()
-    out[y0:y1, x0:x1] = np.where(yeni, kodla(hl), deniz_kodla(hs)).astype(np.int32)
-    Image.fromarray(out.astype(np.uint16)).save("merak/kiyi_16k.png")
+    out[y0:y1, x0:x1] = np.where(yeni, kodla(hl), g[y0:y1, x0:x1]).astype(np.int32)
+    Image.fromarray(out.astype(np.uint16)).save(sys.argv[2] + "_16k.png")
     m16 = coz(out)
-    m8 = np.asarray(Image.fromarray(m16.astype(np.float32), "F").resize((W // 2, (H + 1) // 2 if H % 2 else H // 2), Image.BOX))
     m8 = np.asarray(Image.fromarray(m16.astype(np.float32), "F").resize((8000, 3859), Image.BOX))
-    k8 = np.asarray(Image.open("merak/birlesik_8k.png")).astype(np.int32) > S            # 8k kıyı çizgisi de aynen kalır
-    Image.fromarray(np.where(k8, kodla(np.maximum(m8, 2)), deniz_kodla(np.minimum(m8, -3))).astype(np.uint16)).save("merak/kiyi_8k.png")
+    g8 = np.asarray(Image.open("merak/birlesik_8k.png")).astype(np.int32)   # 8k kıyı çizgisi ve deniz aynen kalır
+    Image.fromarray(np.where(g8 > S, kodla(np.maximum(m8, 2)), g8).astype(np.uint16)).save(sys.argv[2] + "_8k.png")
     # ölçüm
     k2 = yeni; d = ndimage.distance_transform_edt(k2)
     for a, b in [(0, 1), (1, 2), (2, 4), (4, 8), (8, 16)]:
