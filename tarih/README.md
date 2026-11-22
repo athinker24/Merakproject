@@ -12,5 +12,6 @@ Sahibin sabit kıyı maskesinin (`maske.png`) öncesini kuran tarih ve ondan tü
 - `animasyon.py`: 340 milyon yıldan bugüne katı parça geri kurgusu; `cikti/animasyon.mp4`, `cikti/animasyon.gif`, `cikti/donem/`.
 - `belge.py`: dönemleri anlatan PDF (`cikti/tarih.pdf`); Chromium ile basılır: `NODE_PATH=$(npm root -g) python3 belge.py`.
 - `notlar/`: danışmadaki kararlar ve ölçümler.
+- `YONTEM.md`: maskeden Merak haritasına aşamalar ve başka haritada uygulama; `merak/MERAK.md`: Merak aktarımının teknik ayrıntıları.
 
 Ölçek: çerçeve 8000 km × yaklaşık 6100 km; üst kenar 50°K, alt kenar yaklaşık 5°G.
