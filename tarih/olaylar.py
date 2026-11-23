@@ -293,6 +293,10 @@ DONEMLER = [
             (8, "Kanalda okyanus kabuğu", "Güneydoğu kanalının kuzeyinde deniz tabanı yayılması."),
             (5, "Sarı Sıradağları hızla yükselir", "Genç, dik, hızla aşınan dağlar; Tayvan benzeri."),
             (4, "Mor Sıradağları bugünkü yüksekliğinde", "En yüksek doruklar 6 km dolayı; arkadaki yayla ortalama 1 km."),
+            (3, "Köprü Kıstağı kapanır", "1 ile 4 arasındaki boğaz, Köprü Dağları'nın doğusunda dar bir kara şeridiyle kapanır (Panama benzeri): "
+                "Sarı çarpışmasının 4'ü kuzeye sıkıştırması ve makas yarığının en dar yerinde biriken tortu. İç denizin batı okyanusuna "
+                "bağlantısı kesilir; Batı Körfezi okyanusun bir körfezi olarak kalır, iç deniz yalnız güneydoğu kanalıyla açık denize bağlanır. "
+                "1 ile 4 arasında kara canlıları geçişi başlar."),
         ],
     },
     {
@@ -303,7 +307,8 @@ DONEMLER = [
             "kazındı: sayısız küçük göl, fiyortlar, sürüklenmiş kaya örtüsü. Mor Sıradağları, Uzak Sıra ve Sarı "
             "Sıradağları'nda dağ buzulları vadileri derinleştirdi. Deniz seviyesi buzul dönemlerinde 120 metreye kadar "
             "düştü; son buzul çağından sonra yükselen deniz 4'ün güney kıyısındaki dallı nehir vadilerini boğarak "
-            "bugünkü girintili kıyıyı yarattı. Bugün iki çarpışma etkin: 3, 2'nin altına; 5, 4'ün altına giriyor."),
+            "bugünkü girintili kıyıyı yarattı. Bugün iki çarpışma etkin: 3, 2'nin altına; 5, 4'ün altına giriyor. 3 milyon yıl önce kapanan "
+            "Köprü Kıstağı 1 ile 4'ü karadan bağlar ve iç denizin batı çıkışını kapatır."),
         "olaylar": [
             (2.6, "Buzullaşma başlar", "Kuzey kıyılarında buz örtüsü."),
             (0.9, "Büyük buz örtüleri", "Kuzeyde 100 bin yıllık döngüler; Mavi fiyordu derinleşir."),

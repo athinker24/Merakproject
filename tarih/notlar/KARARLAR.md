@@ -85,3 +85,9 @@ Mavi Dağlar: Ural şeridi yerine kıvrımlı Apalaş sırtları (tepe 850 ile 1
   kuzey kol Çanak Sıraları'ndan güneybatıya iner, 44°K dolayında yayla güneye döner; 36 ile 44°K arası altıncı denemenin hattı ve
   dokusu (SIRT_GUNEY yeniden açık). Atlasta 36-44°K tepeler 3274 ile 3678 m, boylam 3,5°B ile 2,7°B, 2000 m üstü genişlik 0,97 ile 1,76°;
   altıncı denemeden kutu içinde ortalama fark 75 m. atlas_yama.py ile yapılan yama bununla geçersiz.
+
+## 23 Kasım 2026: Köprü Kıstağı (sahibin yeni haritası)
+Sahip Merak'taki ana haritaya (dunyam_ana_16k) 1'in güney kıyısı ile 4'ün kuzey kıyısı arasındaki boğaza dar bir kara şeridi
+ekledi (16k'da 3328 piksel, yükseklik %10/%50/%90: 82/231/397 m). Başka kara değişikliği yok. Hikâyeye 3 MYÖ olayı olarak işlendi:
+Sarı çarpışmasının 4'ü kuzeye sıkıştırması ve makas yarığının en dar yerindeki tortu; Panama benzeri. İç denizin batı okyanusuna
+bağlantısı kesildi; iç deniz yalnız güneydoğu kanalıyla açık denize bağlı. Kıstak 1 ve 4 ile aynı (Kuzey) levhada; levha sınırı değil.
