@@ -2,7 +2,7 @@
  "heightmap": {
   "file": "dunya/dunyam_heightmap.png",
   "sea_level_value": 11934,
-  "max_elev_m": 5390.0,
+  "max_elev_m": 5490.0,
   "max_depth_m": -1492.0,
   "elev_gamma": 1.0,
   "bounds": [
@@ -18,7 +18,7 @@
    ],
    [
     1.0,
-    5390.0
+    5490.0
    ]
   ],
   "kabartma": {
@@ -30,5 +30,5 @@
    "iou": 0.9859
   }
  },
- "_not": "Sahibin Merak ana haritası (dunyam_ana_16k, 16000 × 7719). Kıyı ana haritadan: tuvalde 2038 piksel denizden karaya, 19441 piksel karadan denize döndü (ikincisi deniz seviyesinin 400 gri altına). Kayıt: tuval = (ana/4) × (sx 1.28921, sy 1.29474) + (ox -538.49, oy -213.74), IoU 0.9529. Eğri doğrusal: değer metreyi doğrudan taşır."
+ "_not": "Sahibin Merak ana haritası (dunyam_ana_16k, 16000 × 7719). Kıyı ana haritadan: tuvalde 1874 piksel denizden karaya, 20110 piksel karadan denize döndü (ikincisi deniz seviyesinin 400 gri altına). Kayıt: tuval = (ana/4) × (sx 1.29056, sy 1.29348) + (ox -541.80, oy -213.45), IoU 0.9517. Eğri doğrusal: değer metreyi doğrudan taşır."
 }

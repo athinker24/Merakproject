@@ -31,6 +31,11 @@ def main():
     H, W = A.shape
     m16 = coz(A)
     kara16 = A > S
+    # tek piksellik sivri hatalar (fırça izi; 3×3 komşuluk ortancasından 1500 m'den fazla yüksek) ortancaya indirilir
+    orta = ndimage.median_filter(m16, 3)
+    sivri = kara16 & (m16 - orta > 1500)
+    m16 = np.where(sivri, orta, m16)
+    print("sivri hata pikseli", int(sivri.sum()))
     # 4'e indirilmiş: kara payı ve yalnız karada ortalama yükseklik
     k4 = kara16.reshape(H // F, F, -1, F)[:, :, :W // F * 1, :] if False else None
     Hc, Wc = H // F * F, W // F * F
